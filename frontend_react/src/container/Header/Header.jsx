@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Header.scss";
 import { motion } from "framer-motion";
 import { images } from "../../constants";
 import { AppWrap } from "../../wrapper";
+import { client } from "../../client";
 
 const scaleVariants = {
   whileInView: {
@@ -16,6 +17,25 @@ const scaleVariants = {
 };
 
 const Header = () => {
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const response = await fetch(
+        `https://ipinfo.io/json?token=${process.env.REACT_APP_IP_INFO_TOKEN}`
+      );
+      const data = await response.json();
+      const { ip, city, region, country } = data;
+
+      await client.create({
+        _type: "location",
+        ip,
+        region,
+        city,
+        country,
+      });
+    };
+    fetchLocation();
+  }, []);
+
   return (
     <div id="home" className="app__header app__flex">
       <motion.div
